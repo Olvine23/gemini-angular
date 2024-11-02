@@ -6,16 +6,18 @@ import {
   SendMessageEvent,
   User,
 } from '@progress/kendo-angular-conversational-ui';
+import { marked } from 'marked';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GeminiService {
+  readonly LOCAL_STORAGE_KEY = 'chat_messages';
   #generativeAi = new GoogleGenerativeAI(environment.gemini_key);
 
   #prompt =
     'You are a business owner using StockApp (an application that helps run businesses and manage inventory), provide a guide on how to use this product ' +
-    'links for resources';
+    'links for resources. Here is the Website for StockApp https://stockapp.africa . Here are other links https://dev.stockapp.africa/website/detail.html?post=3#content-3, https://dev.stockapp.africa/website/detail.html?post=2#content-2, https://dev.stockapp.africa/website/detail.html?post=1#content-1. customers service numbers are 0791591040 and 0799548240 ';
 
   #model = this.#generativeAi.getGenerativeModel({
     model: 'gemini-1.5-flash',
@@ -40,58 +42,49 @@ export class GeminiService {
       text: 'Hi! 👋 how I can help you today?',
     },
   ]);
+
   async generate(textInput: SendMessageEvent) {
     try {
+      // Add user message to messages list
       if (textInput.message.text && this.#model) {
         this.$messages.update((p) => [...p, textInput.message]);
+
+        // Add loading message
+        const loadingMessage: Message = {
+          author: this.#kendoIA,
+          timestamp: new Date(),
+          text: 'Loading...',
+        };
+        this.$messages.update((p) => [...p, loadingMessage]);
+
         const parts = [
-          {
-            text: this.#prompt,
-          },
+          { text: this.#prompt },
           { text: textInput.message.text },
         ];
 
+        // Generate response from AI model
         const result = await this.#model.generateContent({
           contents: [{ role: 'user', parts }],
         });
 
-        const response = result.response;
-        const text = response.text();
+        // Remove loading message
+        this.$messages.update((p) => p.filter((msg) => msg !== loadingMessage));
 
-        const message = {
+        // Add AI response to messages
+        const response = result.response;
+        const responseText = response.text();
+        const formattedText = await marked(responseText);
+        const message: Message = {
           author: this.#kendoIA,
           timestamp: new Date(),
-          text,
+          text: formattedText,
         };
-
         this.$messages.update((p) => [...p, message]);
       }
     } catch (e: any) {
       console.log(e);
     }
   }
-
-  // async generate(textInput: string) {
-  //   try {
-  //     if (Text) {
-  //       const parts = [
-  //         {
-  //           text: this.#prompt,
-  //         },
-  //         { text: textInput },
-  //       ];
-
-  //       const modelResult = await this.#model.generateContent({
-  //         contents: [{ role: 'user', parts }],
-  //       });
-  //       const response = modelResult.response;
-  //       const text = response.text();
-  //       console.log(text);
-  //     }
-  //   } catch (e: any) {
-  //     console.log(e);
-  //   }
-  // }
 
   constructor() {}
 }

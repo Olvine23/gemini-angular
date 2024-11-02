@@ -10,13 +10,13 @@
     text-align: center;
   }
   
-  main {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+//   main {
+//     display: flex;
+//     flex: 5;
+//     flex-direction: column;
+//     justify-content: center;
+//     align-items: center;
+//   }
   
   footer {
     height: 3rem;
@@ -24,6 +24,22 @@
   }
   
   .kendo-chat-area {
-    height: 442px;
+    height: 438px;
     width: -webkit-fill-available;
   }
+//   .kendo-chat-area p {
+//     margin: 0;
+//     padding: 0;
+// }
+
+// .kendo-chat-area ul,
+// .kendo-chat-area ol {
+//     margin-left: 1rem;
+//     padding: 0;
+// }
+
+// .kendo-chat-area blockquote {
+//     margin: 0;
+//     padding: 0.5rem;
+//     border-left: 2px solid #ccc;
+// }

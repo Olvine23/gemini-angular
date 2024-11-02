@@ -5,14 +5,15 @@
 <main>
   <div class="kendo-chat-area">
 <kendo-chat
+
   [user]="user"
   [messages]="messages()"
   (sendMessage)="generate($event)"
-  width="450px"
+  width="1050px"
 >
   <ng-template kendoChatMessageTemplate let-message>
-    <div>
-      {{ message.text }}
+    <div [innerHTML]="message.text">
+     
       {{ message.avatar }}
     </div>
   </ng-template>
